@@ -5,3 +5,8 @@
 /dist/
 /venv/
 /static/
+
+
+# Added by cargo
+
+/target
