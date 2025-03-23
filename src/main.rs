@@ -1,3 +1,7 @@
-fn main() {
-    println!("Hello, world!");
+use crate::console::enter::enter;
+
+mod console;
+
+fn main() -> anyhow::Result<()> {
+    enter()
 }
