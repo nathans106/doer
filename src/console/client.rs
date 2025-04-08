@@ -1,6 +1,11 @@
+use crate::model::data::Data;
+use crate::model::day_editor::DayEditor;
 use chrono::NaiveDate;
 
-pub struct Client;
+pub struct Client {
+    data: Data,
+    day_editor: DayEditor,
+}
 
 impl Client {
     pub fn plan_priorities(&self, _date: &NaiveDate) {
@@ -61,5 +66,11 @@ impl Client {
 
     pub fn last_date(&self) -> NaiveDate {
         todo!();
+    }
+}
+
+impl Default for Client {
+    fn default() -> Self {
+        todo!()
     }
 }
