@@ -1,3 +1,4 @@
+use crate::config::Config;
 use crate::model::data::Data;
 use crate::model::day_editor::DayEditor;
 use chrono::NaiveDate;
@@ -29,15 +30,17 @@ impl Client {
     }
 
     pub fn context(&self) {
-        todo!();
+        println!("{}", Config::context())
     }
 
     pub fn contexts(&self) {
-        todo!();
+        for context in Config::contexts() {
+            println!("{}", context);
+        }
     }
 
-    pub fn set_context(&self, _context: &str) {
-        todo!();
+    pub fn set_context(&self, context: &str) {
+        Config::set_context(context);
     }
 
     pub fn set_focus_to_priority(&self, _id: &u8) {
