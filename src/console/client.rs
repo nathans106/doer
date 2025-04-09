@@ -68,7 +68,8 @@ impl Client {
     }
 
     pub fn last_date(&self) -> NaiveDate {
-        todo!();
+        self.data.last_date()
+    }
     }
 }
 
