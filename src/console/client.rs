@@ -1,16 +1,31 @@
 use crate::config::Config;
 use crate::model::data::Data;
+use crate::model::day::Priority;
 use crate::model::day_editor::DayEditor;
 use chrono::NaiveDate;
 
 pub struct Client {
     data: Data,
-    day_editor: DayEditor,
 }
 
 impl Client {
-    pub fn plan_priorities(&self, _date: &NaiveDate) {
-        todo!();
+    pub fn plan_priorities(&self, date: &NaiveDate) {
+        {
+            let mut edit_guard = self.edit_day(date);
+            let day = edit_guard.day();
+            let mut items = vec![];
+
+            let current_priorities = day.priorities();
+            if !current_priorities.is_empty() {
+                self.show_priorities(date);
+                items.extend(current_priorities);
+            }
+
+            items.extend(collect_items(date).into_iter());
+            day.set_priorities(order_items(items));
+        }
+
+        self.show_priorities(date);
     }
 
     pub fn copy_priorities(&self, _from: &NaiveDate, _date: &NaiveDate) {
@@ -70,6 +85,13 @@ impl Client {
     pub fn last_date(&self) -> NaiveDate {
         self.data.last_date()
     }
+
+    fn show_priorities(&self, date: &NaiveDate) {
+        todo!()
+    }
+
+    fn edit_day(&self, date: &NaiveDate) -> DayEditor {
+        DayEditor::at(date, &self.data)
     }
 }
 
@@ -77,4 +99,12 @@ impl Default for Client {
     fn default() -> Self {
         todo!()
     }
+}
+
+fn collect_items(date: &NaiveDate) -> Vec<Priority> {
+    todo!()
+}
+
+fn order_items(items: Vec<Priority>) -> Vec<Priority> {
+    todo!()
 }
