@@ -4,6 +4,7 @@ use crate::model::day::Priority;
 use crate::model::day_editor::DayEditor;
 use crate::storage;
 use chrono::{NaiveDate, Utc};
+use inquire::Text;
 
 type Id = u8;
 
@@ -12,7 +13,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn plan_priorities(&self, date: &NaiveDate) {
+    pub fn plan_priorities(&self, date: &NaiveDate) -> anyhow::Result<()> {
         {
             let mut edit_guard = self.edit_day(date);
             let day = edit_guard.day();
@@ -24,11 +25,12 @@ impl Client {
                 items.extend(current_priorities);
             }
 
-            items.extend(collect_items(date));
+            items.extend(collect_items(date)?);
             day.set_priorities(order_items(items));
         }
 
         self.show_priorities(date);
+        Ok(())
     }
 
     pub fn copy_priorities(&self, from: &NaiveDate, to: &NaiveDate) {
@@ -245,10 +247,68 @@ impl Default for Client {
     }
 }
 
-fn collect_items(_date: &NaiveDate) -> Vec<Priority> {
-    todo!()
+fn collect_items(date: &NaiveDate) -> anyhow::Result<Vec<Priority>> {
+    let mut items = vec![];
+    let mut line = Text::new(format!("List items for {date}\n").as_str()).prompt()?;
+
+    while !line.is_empty() {
+        items.push(Priority::new(line));
+        line = Text::new("Anymore?\n").prompt()?;
+    }
+
+    Ok(items)
 }
 
-fn order_items(_items: Vec<Priority>) -> Vec<Priority> {
-    todo!()
+fn order_items(items: Vec<Priority>) -> Vec<Priority> {
+    let mut result = vec![];
+    let mut remaining = items.clone();
+
+    for _i in 0..6 {
+        let max_id = remaining.len() as Id;
+        if max_id == 0 {
+            return result;
+        }
+
+        println!("Remaining:");
+        for (j, item) in remaining.iter().enumerate() {
+            let id = j + 1;
+            let item_name = item.name();
+            println!("{id}. {item_name}");
+        }
+
+        match get_item_id(&max_id) {
+            None => {
+                return result;
+            }
+            Some(choice) => {
+                let choice_id = choice - 1;
+                let priority = remaining.remove(choice_id as usize);
+                result.push(priority);
+            }
+        }
+    }
+
+    result
+}
+
+fn get_item_id(max_id: &Id) -> Option<Id> {
+    loop {
+        match Text::new("Select the top priority, or press enter to end.\n").prompt() {
+            Ok(choice) => match choice.parse::<Id>() {
+                Ok(id) => {
+                    if &id > max_id {
+                        println!("{id} is too large, maximum is {max_id}");
+                    }
+
+                    return Some(id);
+                }
+                Err(_) => {
+                    println!("{choice} is not a digit, please try again");
+                }
+            },
+            Err(_) => {
+                return None;
+            }
+        }
+    }
 }

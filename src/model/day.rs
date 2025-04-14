@@ -40,11 +40,16 @@ impl Day {
     }
 }
 
+#[derive(Clone)]
 pub struct Priority {
     pub done: bool,
 }
 
 impl Priority {
+    pub fn new(_name: String) -> Self {
+        todo!()
+    }
+
     pub fn name(&self) -> String {
         todo!()
     }

@@ -85,7 +85,7 @@ pub fn enter() -> anyhow::Result<()> {
 
     match cli.command {
         Command::Plan { date } => {
-            client.plan_priorities(&date_from_arg(&date)?);
+            client.plan_priorities(&date_from_arg(&date)?)?;
         }
         Command::Copy { from, to } => {
             client.copy_priorities(&date_from_arg(&from)?, &date_from_arg(&to)?);
