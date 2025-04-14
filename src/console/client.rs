@@ -91,21 +91,41 @@ impl Client {
             return;
         }
 
-        day.set_focus(day.priorities()[(id - 1) as usize].name())
+        day.set_focus_to_str(day.priorities()[(id - 1) as usize].name())
     }
 
     pub fn set_focus(&self, focus: &str) {
         let mut edit_guard = self.edit_today();
         let day = edit_guard.day();
-        day.set_focus(focus.to_string())
+        day.set_focus_to_str(focus.to_string())
     }
 
     pub fn start_break(&self) {
-        todo!();
+        let mut edit_guard = self.edit_today();
+        let day = edit_guard.day();
+        match day.focus() {
+            None => {
+                println!("No focus; cannot start break");
+            }
+            Some(mut focus) => {
+                focus.start_break();
+                day.set_focus(focus);
+            }
+        }
     }
 
     pub fn end_break(&self) {
-        todo!();
+        let mut edit_guard = self.edit_today();
+        let day = edit_guard.day();
+        match day.focus() {
+            None => {
+                println!("No focus; cannot end break");
+            }
+            Some(mut focus) => {
+                focus.end_break();
+                day.set_focus(focus);
+            }
+        }
     }
 
     pub fn end_day(&self) {

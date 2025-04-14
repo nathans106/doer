@@ -15,7 +15,11 @@ impl Day {
         todo!()
     }
 
-    pub fn set_focus(&mut self, _focus: String) {
+    pub fn set_focus(&mut self, _focus: Focus) {
+        todo!()
+    }
+
+    pub fn set_focus_to_str(&mut self, _focus: String) {
         todo!()
     }
 
@@ -54,6 +58,14 @@ impl Focus {
     }
 
     pub fn breaks(&self) -> &[Break] {
+        todo!()
+    }
+
+    pub fn start_break(&mut self) {
+        todo!()
+    }
+
+    pub fn end_break(&mut self) {
         todo!()
     }
 }
