@@ -82,12 +82,22 @@ impl Client {
         Config::set_context(context);
     }
 
-    pub fn set_focus_to_priority(&self, _id: &u8) {
-        todo!();
+    pub fn set_focus_to_priority(&self, id: &Id) {
+        let mut edit_guard = self.edit_today();
+        let day = edit_guard.day();
+        let max_id = day.priorities().len();
+        if *id as usize > max_id {
+            println!("id {id} invalid, maximum is {max_id}");
+            return;
+        }
+
+        day.set_focus(day.priorities()[(id - 1) as usize].name())
     }
 
-    pub fn set_focus(&self, _focus: &str) {
-        todo!();
+    pub fn set_focus(&self, focus: &str) {
+        let mut edit_guard = self.edit_today();
+        let day = edit_guard.day();
+        day.set_focus(focus.to_string())
     }
 
     pub fn start_break(&self) {

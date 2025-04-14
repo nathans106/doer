@@ -15,6 +15,10 @@ impl Day {
         todo!()
     }
 
+    pub fn set_focus(&mut self, _focus: String) {
+        todo!()
+    }
+
     pub fn log(&self) -> &[Focus] {
         todo!()
     }

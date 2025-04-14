@@ -114,7 +114,7 @@ pub fn enter() -> anyhow::Result<()> {
         }
         Command::SetFocus { focus } => match focus.parse::<u8>() {
             Ok(id) => {
-                client.set_focus_to_priority(&(id - 1));
+                client.set_focus_to_priority(&(id));
             }
             Err(_) => {
                 client.set_focus(focus);
