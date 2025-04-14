@@ -28,8 +28,14 @@ impl Client {
         self.show_priorities(date);
     }
 
-    pub fn copy_priorities(&self, _from: &NaiveDate, _date: &NaiveDate) {
-        todo!();
+    pub fn copy_priorities(&self, from: &NaiveDate, to: &NaiveDate) {
+        {
+            let mut edit_guard = self.edit_day(to);
+            let day_to = edit_guard.day();
+            let day_from = self.data.day(from);
+            day_to.set_priorities(day_from.priorities());
+        }
+        self.show_priorities(to);
     }
 
     pub fn show(&self, _date: &NaiveDate) {
