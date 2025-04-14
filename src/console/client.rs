@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::model::data::Data;
 use crate::model::day::Priority;
 use crate::model::day_editor::DayEditor;
+use crate::storage;
 use chrono::{NaiveDate, Utc};
 
 type Id = u8;
@@ -238,7 +239,9 @@ impl Client {
 
 impl Default for Client {
     fn default() -> Self {
-        todo!()
+        Self {
+            data: Data::new(storage::database(), Config::context()),
+        }
     }
 }
 
