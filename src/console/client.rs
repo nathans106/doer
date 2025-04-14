@@ -21,7 +21,7 @@ impl Client {
                 items.extend(current_priorities);
             }
 
-            items.extend(collect_items(date).into_iter());
+            items.extend(collect_items(date));
             day.set_priorities(order_items(items));
         }
 
@@ -92,7 +92,7 @@ impl Client {
         self.data.last_date()
     }
 
-    fn show_priorities(&self, date: &NaiveDate) {
+    fn show_priorities(&self, _date: &NaiveDate) {
         todo!()
     }
 
@@ -107,10 +107,10 @@ impl Default for Client {
     }
 }
 
-fn collect_items(date: &NaiveDate) -> Vec<Priority> {
+fn collect_items(_date: &NaiveDate) -> Vec<Priority> {
     todo!()
 }
 
-fn order_items(items: Vec<Priority>) -> Vec<Priority> {
+fn order_items(_items: Vec<Priority>) -> Vec<Priority> {
     todo!()
 }

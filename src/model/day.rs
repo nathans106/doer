@@ -5,7 +5,7 @@ impl Day {
         todo!()
     }
 
-    pub fn set_priorities(&mut self, priorities: Vec<Priority>) {
+    pub fn set_priorities(&mut self, _priorities: Vec<Priority>) {
         todo!()
     }
 }

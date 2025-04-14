@@ -9,7 +9,7 @@ impl Config {
         todo!()
     }
 
-    pub fn set_context(context: &str) {
+    pub fn set_context(_context: &str) {
         todo!()
     }
 }

@@ -5,7 +5,7 @@ use chrono::NaiveDate;
 pub struct DayEditor;
 
 impl DayEditor {
-    pub fn at(date: &NaiveDate, data: &Data) -> Self {
+    pub fn at(_date: &NaiveDate, _data: &Data) -> Self {
         todo!()
     }
 
