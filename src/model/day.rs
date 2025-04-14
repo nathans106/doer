@@ -27,6 +27,10 @@ impl Day {
         todo!()
     }
 
+    pub fn end(&mut self) {
+        todo!()
+    }
+
     pub fn notes(&self) -> &[String] {
         todo!()
     }

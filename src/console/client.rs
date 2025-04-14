@@ -129,7 +129,9 @@ impl Client {
     }
 
     pub fn end_day(&self) {
-        todo!();
+        let mut edit_guard = self.edit_today();
+        let day = edit_guard.day();
+        day.end();
     }
 
     pub fn note(&self, _note: &str) {
