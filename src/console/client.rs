@@ -2,7 +2,9 @@ use crate::config::Config;
 use crate::model::data::Data;
 use crate::model::day::Priority;
 use crate::model::day_editor::DayEditor;
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Utc};
+
+type Id = u8;
 
 pub struct Client {
     data: Data,
@@ -44,12 +46,26 @@ impl Client {
         self.show_notes(date);
     }
 
-    pub fn tick(&self, _id: &u8) {
-        todo!();
+    pub fn tick(&mut self, id: &Id) {
+        self.set_tick(id, true)
     }
 
-    pub fn un_tick(&self, _id: &u8) {
-        todo!();
+    pub fn un_tick(&mut self, id: &Id) {
+        self.set_tick(id, false)
+    }
+
+    fn set_tick(&mut self, id: &Id, is_done: bool) {
+        let mut edit_guard = self.edit_today();
+        let day = edit_guard.day();
+        let max_id = day.priorities().len() - 1;
+        if id > &(max_id as u8) {
+            println!("id {id} invalid, maximum is {max_id}");
+            return;
+        }
+
+        let mut priorities = day.priorities();
+        priorities[*id as usize].done = is_done;
+        day.set_priorities(priorities);
     }
 
     pub fn context(&self) {
@@ -178,6 +194,11 @@ impl Client {
 
     fn edit_day(&self, date: &NaiveDate) -> DayEditor {
         DayEditor::at(date, &self.data)
+    }
+
+    fn edit_today(&self) -> DayEditor {
+        let today = Utc::now().naive_local().date();
+        DayEditor::at(&today, &self.data)
     }
 }
 

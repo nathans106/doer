@@ -24,7 +24,9 @@ impl Day {
     }
 }
 
-pub struct Priority;
+pub struct Priority {
+    pub done: bool,
+}
 
 impl Priority {
     pub fn name(&self) -> String {
