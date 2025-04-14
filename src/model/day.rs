@@ -34,6 +34,10 @@ impl Day {
     pub fn notes(&self) -> &[String] {
         todo!()
     }
+
+    pub fn push_note(&mut self, _note: String) {
+        todo!()
+    }
 }
 
 pub struct Priority {

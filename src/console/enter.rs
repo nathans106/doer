@@ -83,15 +83,15 @@ pub fn enter() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let mut client = Client::default();
 
-    match &cli.command {
+    match cli.command {
         Command::Plan { date } => {
-            client.plan_priorities(&date_from_arg(date)?);
+            client.plan_priorities(&date_from_arg(&date)?);
         }
         Command::Copy { from, to } => {
-            client.copy_priorities(&date_from_arg(from)?, &date_from_arg(to)?);
+            client.copy_priorities(&date_from_arg(&from)?, &date_from_arg(&to)?);
         }
         Command::Show { date } => {
-            client.show(&date_from_arg(date)?);
+            client.show(&date_from_arg(&date)?);
         }
         Command::ShowLast => {
             let date = client.last_date();
@@ -110,14 +110,14 @@ pub fn enter() -> anyhow::Result<()> {
             client.contexts();
         }
         Command::SetContext { context } => {
-            client.set_context(context);
+            client.set_context(&context);
         }
         Command::SetFocus { focus } => match focus.parse::<u8>() {
             Ok(id) => {
                 client.set_focus_to_priority(&(id));
             }
             Err(_) => {
-                client.set_focus(focus);
+                client.set_focus(&focus);
             }
         },
         Command::StartBreak => {

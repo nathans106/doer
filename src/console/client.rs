@@ -134,8 +134,10 @@ impl Client {
         day.end();
     }
 
-    pub fn note(&self, _note: &str) {
-        todo!();
+    pub fn note(&self, note: String) {
+        let mut edit_guard = self.edit_today();
+        let day = edit_guard.day();
+        day.push_note(note);
     }
 
     pub fn last_date(&self) -> NaiveDate {
