@@ -38,8 +38,10 @@ impl Client {
         self.show_priorities(to);
     }
 
-    pub fn show(&self, _date: &NaiveDate) {
-        todo!();
+    pub fn show(&self, date: &NaiveDate) {
+        self.show_priorities(date);
+        self.show_log(date);
+        self.show_notes(date);
     }
 
     pub fn tick(&self, _id: &u8) {
@@ -92,8 +94,86 @@ impl Client {
         self.data.last_date()
     }
 
-    fn show_priorities(&self, _date: &NaiveDate) {
-        todo!()
+    fn show_priorities(&self, date: &NaiveDate) {
+        let day = self.data.day(date);
+
+        if day.priorities().is_empty() {
+            println!("{date} has no priorities");
+            return;
+        }
+
+        let mut focus_name = match &day.focus() {
+            None => String::new(),
+            Some(focus) => focus.name(),
+        };
+
+        println!("Priorities for {date} are:");
+        for (i, priority) in day.priorities().iter().enumerate() {
+            let id = i + 1;
+            let priority_name = priority.name();
+
+            let mut line = format!("{id}. {priority_name}");
+
+            if priority_name == focus_name {
+                line += "*";
+                focus_name = String::new();
+            }
+
+            if priority.is_done() {
+                line += " - done";
+            }
+
+            println!("{line}");
+        }
+
+        if !focus_name.is_empty() {
+            println!("\nFocus: {focus_name}");
+        }
+
+        println!("\n");
+    }
+
+    fn show_log(&self, date: &NaiveDate) {
+        let day = self.data.day(date);
+
+        if day.log().is_empty() {
+            println!("{date} has no log");
+            return;
+        }
+
+        println!("Log for {date} is:");
+
+        for focus in day.log() {
+            let name = focus.name();
+            let start = focus.start().format("%H:%M");
+            println!("{start} - {name}");
+
+            for break_ in focus.breaks() {
+                let break_start = break_.start().format("%H:%M");
+                let break_end = break_.end().format("%H:%M");
+                println!("\t{break_start} - {break_end}");
+            }
+        }
+
+        println!("\n");
+    }
+
+    fn show_notes(&self, date: &NaiveDate) {
+        let day = self.data.day(date);
+
+        if day.notes().is_empty() {
+            println!("{date} has no notes");
+            return;
+        }
+
+        println!("Notes for {date}:");
+
+        for (i, note) in day.notes().iter().enumerate() {
+            let id = i + 1;
+            println!("{id}. {note}");
+        }
+
+        println!("\n");
     }
 
     fn edit_day(&self, date: &NaiveDate) -> DayEditor {
