@@ -2,20 +2,28 @@ use crate::model::data::Data;
 use crate::model::day::Day;
 use chrono::NaiveDate;
 
-pub struct DayEditor;
+pub struct DayEditor<'data> {
+    date: NaiveDate,
+    data: &'data Data,
+    day: Day,
+}
 
-impl DayEditor {
-    pub fn at(_date: &NaiveDate, _data: &Data) -> Self {
-        todo!()
+impl<'data> DayEditor<'data> {
+    pub fn at(date: NaiveDate, data: &'data Data) -> Self {
+        Self {
+            date,
+            data,
+            day: data.day(&date),
+        }
     }
 
     pub fn day(&mut self) -> &mut Day {
-        todo!()
+        &mut self.day
     }
 }
 
-impl Drop for DayEditor {
+impl Drop for DayEditor<'_> {
     fn drop(&mut self) {
-        todo!()
+        self.data.set_day(&self.date, &self.day);
     }
 }

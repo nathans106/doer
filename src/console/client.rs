@@ -15,7 +15,7 @@ pub struct Client {
 impl Client {
     pub fn plan_priorities(&self, date: &NaiveDate) -> anyhow::Result<()> {
         {
-            let mut edit_guard = self.edit_day(date);
+            let mut edit_guard = self.edit_day(*date);
             let day = edit_guard.day();
             let mut items = vec![];
 
@@ -35,7 +35,7 @@ impl Client {
 
     pub fn copy_priorities(&self, from: &NaiveDate, to: &NaiveDate) {
         {
-            let mut edit_guard = self.edit_day(to);
+            let mut edit_guard = self.edit_day(*to);
             let day_to = edit_guard.day();
             let day_from = self.data.day(from);
             day_to.set_priorities(day_from.priorities());
@@ -229,13 +229,13 @@ impl Client {
         println!("\n");
     }
 
-    fn edit_day(&self, date: &NaiveDate) -> DayEditor {
+    fn edit_day(&self, date: NaiveDate) -> DayEditor {
         DayEditor::at(date, &self.data)
     }
 
     fn edit_today(&self) -> DayEditor {
         let today = Utc::now().naive_local().date();
-        DayEditor::at(&today, &self.data)
+        DayEditor::at(today, &self.data)
     }
 }
 

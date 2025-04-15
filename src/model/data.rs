@@ -16,4 +16,8 @@ impl Data {
     pub fn day(&self, _date: &NaiveDate) -> Day {
         todo!()
     }
+
+    pub fn set_day(&self, _date: &NaiveDate, _day: &Day) {
+        todo!()
+    }
 }
