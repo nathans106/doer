@@ -81,7 +81,7 @@ fn date_from_arg(date: &str) -> anyhow::Result<NaiveDate> {
 
 pub fn enter() -> anyhow::Result<()> {
     let cli = Cli::parse();
-    let mut client = Client::default();
+    let mut client = Client::new()?;
 
     match cli.command {
         Command::Plan { date } => {

@@ -1,11 +1,11 @@
 use crate::model::day::Day;
 use chrono::NaiveDate;
-use std::path::PathBuf;
+use std::path::Path;
 
 pub struct Data;
 
 impl Data {
-    pub fn new(_database: PathBuf, _context: String) -> Self {
+    pub fn new(_database: &Path, _context: String) -> Self {
         todo!()
     }
 

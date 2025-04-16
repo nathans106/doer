@@ -2,7 +2,7 @@ use crate::config::Config;
 use crate::model::data::Data;
 use crate::model::day::Priority;
 use crate::model::day_editor::DayEditor;
-use crate::storage;
+use crate::storage::Storage;
 use chrono::{NaiveDate, Utc};
 use inquire::Text;
 
@@ -13,6 +13,13 @@ pub struct Client {
 }
 
 impl Client {
+    pub(crate) fn new() -> anyhow::Result<Self> {
+        let storage = Storage::new()?;
+        Ok(Self {
+            data: Data::new(storage.database(), Config::context()),
+        })
+    }
+
     pub fn plan_priorities(&self, date: &NaiveDate) -> anyhow::Result<()> {
         {
             let mut edit_guard = self.edit_day(*date);
@@ -236,14 +243,6 @@ impl Client {
     fn edit_today(&self) -> DayEditor {
         let today = Utc::now().naive_local().date();
         DayEditor::at(today, &self.data)
-    }
-}
-
-impl Default for Client {
-    fn default() -> Self {
-        Self {
-            data: Data::new(storage::database(), Config::context()),
-        }
     }
 }
 
