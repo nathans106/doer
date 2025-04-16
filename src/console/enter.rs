@@ -121,10 +121,10 @@ pub fn enter() -> anyhow::Result<()> {
             }
         },
         Command::StartBreak => {
-            client.start_break();
+            client.start_break()?;
         }
         Command::EndBreak => {
-            client.end_break();
+            client.end_break()?;
         }
         Command::EndDay => {
             client.end_day();

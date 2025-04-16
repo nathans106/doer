@@ -1,42 +1,71 @@
+use anyhow::anyhow;
 use chrono::{NaiveDateTime, NaiveTime, Utc};
 
-pub struct Day;
+pub struct Day {
+    priorities: Vec<Priority>,
+    log: Vec<Focus>,
+    end_time: NaiveTime,
+    notes: Vec<String>,
+}
 
 impl Day {
-    pub fn priorities(&self) -> Vec<Priority> {
-        todo!()
+    pub fn priorities(&self) -> &[Priority] {
+        self.priorities.as_slice()
     }
 
-    pub fn set_priorities(&mut self, _priorities: Vec<Priority>) {
-        todo!()
+    pub fn set_priorities(&mut self, priorities: Vec<Priority>) {
+        self.priorities = priorities;
     }
 
-    pub fn focus(&self) -> Option<Focus> {
-        todo!()
+    pub fn focus(&self) -> Option<&Focus> {
+        self.log.last()
     }
 
-    pub fn set_focus(&mut self, _focus: Focus) {
-        todo!()
+    pub fn set_focus_to_str(&mut self, name: String) {
+        match self.log.last() {
+            None => self.log.push(Focus::new(name, Utc::now().time())),
+            Some(last_focus) => {
+                if last_focus.name() != name {
+                    self.log.push(Focus::new(name, Utc::now().time()))
+                }
+            }
+        }
     }
 
-    pub fn set_focus_to_str(&mut self, _focus: String) {
-        todo!()
+    pub fn start_break(&mut self) -> anyhow::Result<()> {
+        match self.log.last_mut() {
+            None => Err(anyhow!("No focus; cannot start break")),
+            Some(focus) => {
+                focus.start_break();
+                Ok(())
+            }
+        }
+    }
+
+    pub fn end_break(&mut self) -> anyhow::Result<()> {
+        match self.log.last_mut() {
+            None => Err(anyhow!("No focus; cannot end break")),
+            Some(focus) => {
+                focus.end_break();
+                Ok(())
+            }
+        }
     }
 
     pub fn log(&self) -> &[Focus] {
-        todo!()
+        self.log.as_slice()
     }
 
     pub fn end(&mut self) {
-        todo!()
+        self.end_time = Utc::now().time();
     }
 
     pub fn notes(&self) -> &[String] {
-        todo!()
+        self.notes.as_slice()
     }
 
-    pub fn push_note(&mut self, _note: String) {
-        todo!()
+    pub fn push_note(&mut self, note: String) {
+        self.notes.push(note);
     }
 }
 
@@ -62,6 +91,10 @@ impl Priority {
 pub struct Focus;
 
 impl Focus {
+    pub fn new(_name: String, _time: NaiveTime) -> Self {
+        todo!()
+    }
+
     pub fn name(&self) -> String {
         todo!()
     }

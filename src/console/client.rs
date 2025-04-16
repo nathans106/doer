@@ -25,12 +25,12 @@ impl Client {
         {
             let mut edit_guard = self.edit_day(*date);
             let day = edit_guard.day();
-            let mut items = vec![];
+            let mut items: Vec<Priority> = vec![];
 
             let current_priorities = day.priorities();
             if !current_priorities.is_empty() {
                 self.show_priorities(date);
-                items.extend(current_priorities);
+                items.extend(current_priorities.iter().cloned());
             }
 
             items.extend(collect_items(date)?);
@@ -46,7 +46,7 @@ impl Client {
             let mut edit_guard = self.edit_day(*to);
             let day_to = edit_guard.day();
             let day_from = self.data.day(from);
-            day_to.set_priorities(day_from.priorities());
+            day_to.set_priorities(day_from.priorities().to_vec());
         }
         self.show_priorities(to);
     }
@@ -74,7 +74,7 @@ impl Client {
             return;
         }
 
-        let mut priorities = day.priorities();
+        let mut priorities: Vec<Priority> = day.priorities().to_vec();
         priorities[*id as usize].done = is_done;
         day.set_priorities(priorities);
     }
@@ -114,32 +114,18 @@ impl Client {
         day.set_focus_to_str(focus.to_string())
     }
 
-    pub fn start_break(&self) {
+    pub fn start_break(&self) -> anyhow::Result<()> {
         let mut edit_guard = self.edit_today();
         let day = edit_guard.day();
-        match day.focus() {
-            None => {
-                println!("No focus; cannot start break");
-            }
-            Some(mut focus) => {
-                focus.start_break();
-                day.set_focus(focus);
-            }
-        }
+        day.start_break()?;
+        Ok(())
     }
 
-    pub fn end_break(&self) {
+    pub fn end_break(&self) -> anyhow::Result<()> {
         let mut edit_guard = self.edit_today();
         let day = edit_guard.day();
-        match day.focus() {
-            None => {
-                println!("No focus; cannot end break");
-            }
-            Some(mut focus) => {
-                focus.end_break();
-                day.set_focus(focus);
-            }
-        }
+        day.end_break()?;
+        Ok(())
     }
 
     pub fn end_day(&self) {
