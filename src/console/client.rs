@@ -154,7 +154,7 @@ impl Client {
 
         let mut focus_name = match &day.focus() {
             None => String::new(),
-            Some(focus) => focus.name(),
+            Some(focus) => focus.name().clone(),
         };
 
         println!("Priorities for {date} are:");

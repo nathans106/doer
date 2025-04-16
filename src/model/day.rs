@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use chrono::{NaiveDateTime, NaiveTime, Utc};
+use chrono::{NaiveTime, Utc};
 
 pub struct Day {
     priorities: Vec<Priority>,
@@ -25,7 +25,7 @@ impl Day {
         match self.log.last() {
             None => self.log.push(Focus::new(name, Utc::now().time())),
             Some(last_focus) => {
-                if last_focus.name() != name {
+                if last_focus.name() != &name {
                     self.log.push(Focus::new(name, Utc::now().time()))
                 }
             }
@@ -36,7 +36,7 @@ impl Day {
         match self.log.last_mut() {
             None => Err(anyhow!("No focus; cannot start break")),
             Some(focus) => {
-                focus.start_break();
+                focus.start_break()?;
                 Ok(())
             }
         }
@@ -88,31 +88,57 @@ impl Priority {
     }
 }
 
-pub struct Focus;
+pub struct Focus {
+    name: String,
+    start_time: NaiveTime,
+    breaks: Vec<Break>,
+}
 
 impl Focus {
-    pub fn new(_name: String, _time: NaiveTime) -> Self {
-        todo!()
+    pub fn new(name: String, time: NaiveTime) -> Self {
+        Self {
+            name,
+            start_time: time,
+            breaks: vec![],
+        }
     }
 
-    pub fn name(&self) -> String {
-        todo!()
+    pub fn name(&self) -> &String {
+        &self.name
     }
 
-    pub fn start(&self) -> NaiveDateTime {
-        todo!()
+    pub fn start(&self) -> &NaiveTime {
+        &self.start_time
     }
 
     pub fn breaks(&self) -> &[Break] {
-        todo!()
+        self.breaks.as_slice()
     }
 
-    pub fn start_break(&mut self) {
-        todo!()
+    pub fn start_break(&mut self) -> anyhow::Result<()> {
+        let break_ = Break::new(Utc::now().time());
+
+        match self.breaks.last_mut() {
+            None => {}
+            Some(last_break) => match last_break.end_time {
+                None => {
+                    Err(anyhow!("Starting break when previous has not ended."))?;
+                }
+                Some(end_time) => {
+                    assert!(end_time > break_.start_time);
+                }
+            },
+        }
+
+        self.breaks.push(break_);
+        Ok(())
     }
 
     pub fn end_break(&mut self) {
-        todo!()
+        match self.breaks.last_mut() {
+            None => {}
+            Some(last_break) => last_break.end(),
+        }
     }
 }
 
