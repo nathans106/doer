@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, NaiveTime, Utc};
 
 pub struct Day;
 
@@ -83,14 +83,20 @@ impl Focus {
     }
 }
 
-pub struct Break;
+pub struct Break {
+    pub start_time: NaiveTime,
+    pub end_time: Option<NaiveTime>,
+}
 
 impl Break {
-    pub fn start(&self) -> NaiveDateTime {
-        todo!()
+    pub fn new(start_time: NaiveTime) -> Self {
+        Self {
+            start_time,
+            end_time: None,
+        }
     }
 
-    pub fn end(&self) -> NaiveDateTime {
-        todo!()
+    pub fn end(&mut self) {
+        self.end_time = Some(Utc::now().naive_local().time());
     }
 }

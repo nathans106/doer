@@ -213,9 +213,15 @@ impl Client {
             println!("{start} - {name}");
 
             for break_ in focus.breaks() {
-                let break_start = break_.start().format("%H:%M");
-                let break_end = break_.end().format("%H:%M");
-                println!("\t{break_start} - {break_end}");
+                let break_start = break_.start_time.format("%H:%M");
+                let mut line = format!("\t{break_start}");
+                match break_.end_time {
+                    None => {}
+                    Some(end_time) => {
+                        line += &format!(" - {end_time}");
+                    }
+                }
+                println!("{}", line);
             }
         }
 
