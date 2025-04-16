@@ -9,15 +9,16 @@ use inquire::Text;
 type Id = u8;
 
 pub struct Client {
+    config: Config,
     data: Data,
 }
 
 impl Client {
-    pub(crate) fn new() -> anyhow::Result<Self> {
+    pub fn new() -> anyhow::Result<Self> {
         let storage = Storage::new()?;
-        Ok(Self {
-            data: Data::new(storage.database(), Config::context()),
-        })
+        let config = Config::new(storage.clone());
+        let data = Data::new(storage.database(), config.context()?);
+        Ok(Self { config, data })
     }
 
     pub fn plan_priorities(&self, date: &NaiveDate) -> anyhow::Result<()> {
@@ -78,18 +79,21 @@ impl Client {
         day.set_priorities(priorities);
     }
 
-    pub fn context(&self) {
-        println!("{}", Config::context())
+    pub fn context(&self) -> anyhow::Result<()> {
+        println!("{}", self.config.context()?);
+        Ok(())
     }
 
-    pub fn contexts(&self) {
-        for context in Config::contexts() {
+    pub fn contexts(&self) -> anyhow::Result<()> {
+        for context in self.config.contexts()? {
             println!("{}", context);
         }
+        Ok(())
     }
 
-    pub fn set_context(&self, context: &str) {
-        Config::set_context(context);
+    pub fn set_context(&self, context: String) -> anyhow::Result<()> {
+        self.config.set_context(context)?;
+        Ok(())
     }
 
     pub fn set_focus_to_priority(&self, id: &Id) {

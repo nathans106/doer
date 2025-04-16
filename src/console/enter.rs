@@ -104,13 +104,13 @@ pub fn enter() -> anyhow::Result<()> {
             client.un_tick(&(id - 1));
         }
         Command::Context => {
-            client.context();
+            client.context()?;
         }
         Command::Contexts => {
-            client.contexts();
+            client.contexts()?;
         }
         Command::SetContext { context } => {
-            client.set_context(&context);
+            client.set_context(context)?;
         }
         Command::SetFocus { focus } => match focus.parse::<u8>() {
             Ok(id) => {
