@@ -75,7 +75,7 @@ impl Client {
         }
 
         let mut priorities: Vec<Priority> = day.priorities().to_vec();
-        priorities[*id as usize].done = is_done;
+        priorities[*id as usize].is_done = is_done;
         day.set_priorities(priorities);
     }
 
@@ -105,7 +105,7 @@ impl Client {
             return;
         }
 
-        day.set_focus_to_str(day.priorities()[(id - 1) as usize].name())
+        day.set_focus_to_str(day.priorities()[(id - 1) as usize].name.clone())
     }
 
     pub fn set_focus(&self, focus: &str) {
@@ -160,16 +160,16 @@ impl Client {
         println!("Priorities for {date} are:");
         for (i, priority) in day.priorities().iter().enumerate() {
             let id = i + 1;
-            let priority_name = priority.name();
+            let priority_name = &priority.name;
 
             let mut line = format!("{id}. {priority_name}");
 
-            if priority_name == focus_name {
+            if priority_name == &focus_name {
                 line += "*";
                 focus_name = String::new();
             }
 
-            if priority.is_done() {
+            if priority.is_done {
                 line += " - done";
             }
 
@@ -267,7 +267,7 @@ fn order_items(items: Vec<Priority>) -> Vec<Priority> {
         println!("Remaining:");
         for (j, item) in remaining.iter().enumerate() {
             let id = j + 1;
-            let item_name = item.name();
+            let item_name = &item.name;
             println!("{id}. {item_name}");
         }
 

@@ -71,20 +71,16 @@ impl Day {
 
 #[derive(Clone)]
 pub struct Priority {
-    pub done: bool,
+    pub name: String,
+    pub is_done: bool,
 }
 
 impl Priority {
-    pub fn new(_name: String) -> Self {
-        todo!()
-    }
-
-    pub fn name(&self) -> String {
-        todo!()
-    }
-
-    pub fn is_done(&self) -> bool {
-        todo!()
+    pub fn new(name: String) -> Self {
+        Priority {
+            name,
+            is_done: false,
+        }
     }
 }
 
