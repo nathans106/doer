@@ -1,6 +1,8 @@
 use anyhow::anyhow;
 use chrono::{NaiveTime, Utc};
+use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Day {
     priorities: Vec<Priority>,
     log: Vec<Focus>,
@@ -69,7 +71,13 @@ impl Day {
     }
 }
 
-#[derive(Clone)]
+impl Default for Day {
+    fn default() -> Self {
+        todo!()
+    }
+}
+
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Priority {
     pub name: String,
     pub is_done: bool,
@@ -84,6 +92,7 @@ impl Priority {
     }
 }
 
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Focus {
     name: String,
     start_time: NaiveTime,
@@ -138,6 +147,7 @@ impl Focus {
     }
 }
 
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Break {
     pub start_time: NaiveTime,
     pub end_time: Option<NaiveTime>,

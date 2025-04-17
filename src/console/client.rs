@@ -5,6 +5,7 @@ use crate::model::day_editor::DayEditor;
 use crate::storage::Storage;
 use chrono::{NaiveDate, Utc};
 use inquire::Text;
+use std::path::PathBuf;
 
 type Id = u8;
 
@@ -17,19 +18,19 @@ impl Client {
     pub fn new() -> anyhow::Result<Self> {
         let storage = Storage::new()?;
         let config = Config::new(storage.clone());
-        let data = Data::new(storage.database(), config.context()?);
+        let data = Data::new(PathBuf::from(storage.database()), config.context()?)?;
         Ok(Self { config, data })
     }
 
     pub fn plan_priorities(&self, date: &NaiveDate) -> anyhow::Result<()> {
         {
-            let mut edit_guard = self.edit_day(*date);
+            let mut edit_guard = self.edit_day(*date)?;
             let day = edit_guard.day();
             let mut items: Vec<Priority> = vec![];
 
             let current_priorities = day.priorities();
             if !current_priorities.is_empty() {
-                self.show_priorities(date);
+                self.show_priorities(date)?;
                 items.extend(current_priorities.iter().cloned());
             }
 
@@ -37,46 +38,49 @@ impl Client {
             day.set_priorities(order_items(items));
         }
 
-        self.show_priorities(date);
+        self.show_priorities(date)?;
         Ok(())
     }
 
-    pub fn copy_priorities(&self, from: &NaiveDate, to: &NaiveDate) {
+    pub fn copy_priorities(&self, from: &NaiveDate, to: &NaiveDate) -> anyhow::Result<()> {
         {
-            let mut edit_guard = self.edit_day(*to);
+            let mut edit_guard = self.edit_day(*to)?;
             let day_to = edit_guard.day();
-            let day_from = self.data.day(from);
+            let day_from = self.data.day(from)?;
             day_to.set_priorities(day_from.priorities().to_vec());
         }
-        self.show_priorities(to);
+        self.show_priorities(to)?;
+        Ok(())
     }
 
-    pub fn show(&self, date: &NaiveDate) {
-        self.show_priorities(date);
-        self.show_log(date);
-        self.show_notes(date);
+    pub fn show(&self, date: &NaiveDate) -> anyhow::Result<()> {
+        self.show_priorities(date)?;
+        self.show_log(date)?;
+        self.show_notes(date)?;
+        Ok(())
     }
 
-    pub fn tick(&mut self, id: &Id) {
+    pub fn tick(&mut self, id: &Id) -> anyhow::Result<()> {
         self.set_tick(id, true)
     }
 
-    pub fn un_tick(&mut self, id: &Id) {
+    pub fn un_tick(&mut self, id: &Id) -> anyhow::Result<()> {
         self.set_tick(id, false)
     }
 
-    fn set_tick(&mut self, id: &Id, is_done: bool) {
-        let mut edit_guard = self.edit_today();
+    fn set_tick(&mut self, id: &Id, is_done: bool) -> anyhow::Result<()> {
+        let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
         let max_id = day.priorities().len() - 1;
         if id > &(max_id as u8) {
             println!("id {id} invalid, maximum is {max_id}");
-            return;
+            return Ok(());
         }
 
         let mut priorities: Vec<Priority> = day.priorities().to_vec();
         priorities[*id as usize].is_done = is_done;
         day.set_priorities(priorities);
+        Ok(())
     }
 
     pub fn context(&self) -> anyhow::Result<()> {
@@ -96,60 +100,64 @@ impl Client {
         Ok(())
     }
 
-    pub fn set_focus_to_priority(&self, id: &Id) {
-        let mut edit_guard = self.edit_today();
+    pub fn set_focus_to_priority(&self, id: &Id) -> anyhow::Result<()> {
+        let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
         let max_id = day.priorities().len();
         if *id as usize > max_id {
             println!("id {id} invalid, maximum is {max_id}");
-            return;
+            return Ok(());
         }
 
-        day.set_focus_to_str(day.priorities()[(id - 1) as usize].name.clone())
+        day.set_focus_to_str(day.priorities()[(id - 1) as usize].name.clone());
+        Ok(())
     }
 
-    pub fn set_focus(&self, focus: &str) {
-        let mut edit_guard = self.edit_today();
+    pub fn set_focus(&self, focus: &str) -> anyhow::Result<()> {
+        let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
-        day.set_focus_to_str(focus.to_string())
+        day.set_focus_to_str(focus.to_string());
+        Ok(())
     }
 
     pub fn start_break(&self) -> anyhow::Result<()> {
-        let mut edit_guard = self.edit_today();
+        let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
         day.start_break()?;
         Ok(())
     }
 
     pub fn end_break(&self) -> anyhow::Result<()> {
-        let mut edit_guard = self.edit_today();
+        let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
         day.end_break()?;
         Ok(())
     }
 
-    pub fn end_day(&self) {
-        let mut edit_guard = self.edit_today();
+    pub fn end_day(&self) -> anyhow::Result<()> {
+        let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
         day.end();
+        Ok(())
     }
 
-    pub fn note(&self, note: String) {
-        let mut edit_guard = self.edit_today();
+    pub fn note(&self, note: String) -> anyhow::Result<()> {
+        let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
         day.push_note(note);
+        Ok(())
     }
 
-    pub fn last_date(&self) -> NaiveDate {
+    pub fn last_date(&self) -> anyhow::Result<NaiveDate> {
         self.data.last_date()
     }
 
-    fn show_priorities(&self, date: &NaiveDate) {
-        let day = self.data.day(date);
+    fn show_priorities(&self, date: &NaiveDate) -> anyhow::Result<()> {
+        let day = self.data.day(date)?;
 
         if day.priorities().is_empty() {
             println!("{date} has no priorities");
-            return;
+            return Ok(());
         }
 
         let mut focus_name = match &day.focus() {
@@ -181,14 +189,15 @@ impl Client {
         }
 
         println!("\n");
+        Ok(())
     }
 
-    fn show_log(&self, date: &NaiveDate) {
-        let day = self.data.day(date);
+    fn show_log(&self, date: &NaiveDate) -> anyhow::Result<()> {
+        let day = self.data.day(date)?;
 
         if day.log().is_empty() {
             println!("{date} has no log");
-            return;
+            return Ok(());
         }
 
         println!("Log for {date} is:");
@@ -212,14 +221,15 @@ impl Client {
         }
 
         println!("\n");
+        Ok(())
     }
 
-    fn show_notes(&self, date: &NaiveDate) {
-        let day = self.data.day(date);
+    fn show_notes(&self, date: &NaiveDate) -> anyhow::Result<()> {
+        let day = self.data.day(date)?;
 
         if day.notes().is_empty() {
             println!("{date} has no notes");
-            return;
+            return Ok(());
         }
 
         println!("Notes for {date}:");
@@ -230,13 +240,14 @@ impl Client {
         }
 
         println!("\n");
+        Ok(())
     }
 
-    fn edit_day(&self, date: NaiveDate) -> DayEditor {
+    fn edit_day(&self, date: NaiveDate) -> anyhow::Result<DayEditor> {
         DayEditor::at(date, &self.data)
     }
 
-    fn edit_today(&self) -> DayEditor {
+    fn edit_today(&self) -> anyhow::Result<DayEditor> {
         let today = Utc::now().naive_local().date();
         DayEditor::at(today, &self.data)
     }

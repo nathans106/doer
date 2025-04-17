@@ -9,12 +9,12 @@ pub struct DayEditor<'data> {
 }
 
 impl<'data> DayEditor<'data> {
-    pub fn at(date: NaiveDate, data: &'data Data) -> Self {
-        Self {
+    pub fn at(date: NaiveDate, data: &'data Data) -> anyhow::Result<Self> {
+        Ok(Self {
             date,
             data,
-            day: data.day(&date),
-        }
+            day: data.day(&date)?,
+        })
     }
 
     pub fn day(&mut self) -> &mut Day {
@@ -24,6 +24,8 @@ impl<'data> DayEditor<'data> {
 
 impl Drop for DayEditor<'_> {
     fn drop(&mut self) {
-        self.data.set_day(&self.date, &self.day);
+        self.data
+            .set_day(self.date, self.day.clone())
+            .expect("Failed to set day");
     }
 }

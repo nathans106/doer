@@ -88,20 +88,20 @@ pub fn enter() -> anyhow::Result<()> {
             client.plan_priorities(&date_from_arg(&date)?)?;
         }
         Command::Copy { from, to } => {
-            client.copy_priorities(&date_from_arg(&from)?, &date_from_arg(&to)?);
+            client.copy_priorities(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
         }
         Command::Show { date } => {
-            client.show(&date_from_arg(&date)?);
+            client.show(&date_from_arg(&date)?)?;
         }
         Command::ShowLast => {
-            let date = client.last_date();
-            client.show(&date);
+            let date = client.last_date()?;
+            client.show(&date)?;
         }
         Command::Tick { id } => {
-            client.tick(&(id - 1));
+            client.tick(&(id - 1))?;
         }
         Command::UnTick { id } => {
-            client.un_tick(&(id - 1));
+            client.un_tick(&(id - 1))?;
         }
         Command::Context => {
             client.context()?;
@@ -114,10 +114,10 @@ pub fn enter() -> anyhow::Result<()> {
         }
         Command::SetFocus { focus } => match focus.parse::<u8>() {
             Ok(id) => {
-                client.set_focus_to_priority(&(id));
+                client.set_focus_to_priority(&(id))?;
             }
             Err(_) => {
-                client.set_focus(&focus);
+                client.set_focus(&focus)?;
             }
         },
         Command::StartBreak => {
@@ -127,10 +127,10 @@ pub fn enter() -> anyhow::Result<()> {
             client.end_break()?;
         }
         Command::EndDay => {
-            client.end_day();
+            client.end_day()?;
         }
         Command::Note { note } => {
-            client.note(note);
+            client.note(note)?;
         }
     }
 
