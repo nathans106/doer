@@ -1,5 +1,5 @@
 use crate::model::day::Day;
-use crate::model::year::{Year, year_to_json};
+use crate::model::year::{Year, year_from_json, year_to_json};
 use anyhow::anyhow;
 use chrono::{Datelike, NaiveDate, Utc};
 use itertools::Itertools;
@@ -25,7 +25,7 @@ impl Data {
     fn get_year(&self, year_num: &YearNum) -> anyhow::Result<Year> {
         let year_file = self.year_file(year_num);
         if year_file.exists() {
-            let year = serde_json::from_str(&fs::read_to_string(year_file)?)?;
+            let year = year_from_json(&fs::read_to_string(year_file)?)?;
             Ok(year)
         } else {
             Ok(Year::new())

@@ -1,8 +1,7 @@
 use anyhow::anyhow;
 use chrono::{NaiveTime, Utc};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone)]
 pub struct Day {
     priorities: Vec<Priority>,
     log: Vec<Focus>,
@@ -11,6 +10,20 @@ pub struct Day {
 }
 
 impl Day {
+    pub fn new(
+        priorities: Vec<Priority>,
+        log: Vec<Focus>,
+        end_time: Option<NaiveTime>,
+        notes: Vec<String>,
+    ) -> Self {
+        Self {
+            priorities,
+            log,
+            end_time,
+            notes,
+        }
+    }
+
     pub fn priorities(&self) -> &[Priority] {
         self.priorities.as_slice()
     }
@@ -81,7 +94,7 @@ impl Default for Day {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone)]
 pub struct Priority {
     pub name: String,
     pub is_done: bool,
@@ -96,7 +109,7 @@ impl Priority {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone)]
 pub struct Focus {
     name: String,
     start_time: NaiveTime,
@@ -104,6 +117,14 @@ pub struct Focus {
 }
 
 impl Focus {
+    pub fn full(name: String, start_time: NaiveTime, breaks: Vec<Break>) -> Self {
+        Self {
+            name,
+            start_time,
+            breaks,
+        }
+    }
+
     pub fn new(name: String, time: NaiveTime) -> Self {
         Self {
             name,
@@ -151,7 +172,7 @@ impl Focus {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone)]
 pub struct Break {
     pub start_time: NaiveTime,
     pub end_time: Option<NaiveTime>,
