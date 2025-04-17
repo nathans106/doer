@@ -97,7 +97,7 @@ impl Data {
 
     fn set_year(&self, year_num: YearNum, year: Year) -> anyhow::Result<()> {
         let year_file = self.year_file(&year_num);
-        let year_map = year_to_json(&year);
+        let year_map = year_to_json(&year)?;
         fs::write(year_file, year_map)?;
         Ok(())
     }

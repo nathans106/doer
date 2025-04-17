@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct Day {
     priorities: Vec<Priority>,
     log: Vec<Focus>,
-    end_time: NaiveTime,
+    end_time: Option<NaiveTime>,
     notes: Vec<String>,
 }
 
@@ -59,7 +59,11 @@ impl Day {
     }
 
     pub fn end(&mut self) {
-        self.end_time = Utc::now().time();
+        self.end_time = Some(Utc::now().time());
+    }
+
+    pub fn end_time(&self) -> &Option<NaiveTime> {
+        &self.end_time
     }
 
     pub fn notes(&self) -> &[String] {
