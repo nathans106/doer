@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{NaiveTime, Utc};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Day {
     priorities: Vec<Priority>,
     log: Vec<Focus>,
@@ -85,12 +85,6 @@ impl Day {
 
     pub fn push_note(&mut self, note: String) {
         self.notes.push(note);
-    }
-}
-
-impl Default for Day {
-    fn default() -> Self {
-        todo!()
     }
 }
 
