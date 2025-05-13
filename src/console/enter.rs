@@ -50,6 +50,12 @@ enum Command {
         /// Note for today
         note: String,
     },
+    CopyNotes {
+        /// Date to copy from. Can be 'today', 'tomorrow', or a date in 'ISO format'
+        from: String,
+        /// Date to copy to. Can be 'today', 'tomorrow', or a date in 'ISO format'
+        to: String,
+    },
 }
 
 fn weekday(id: &i64) -> NaiveDate {
@@ -131,6 +137,9 @@ pub fn enter() -> anyhow::Result<()> {
         }
         Command::Note { note } => {
             client.note(note)?;
+        }
+        Command::CopyNotes { from, to } => {
+            client.copy_notes(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
         }
     }
 

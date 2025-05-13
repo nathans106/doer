@@ -148,6 +148,17 @@ impl Client {
         Ok(())
     }
 
+    pub fn copy_notes(&self, from: &NaiveDate, to: &NaiveDate) -> anyhow::Result<()> {
+        {
+            let mut edit_guard = self.edit_day(*to)?;
+            let day_to = edit_guard.day();
+            let day_from = self.data.day(from)?;
+            day_to.extend_notes(day_from.notes());
+        }
+        self.show_notes(to)?;
+        Ok(())
+    }
+
     pub fn last_date(&self) -> anyhow::Result<NaiveDate> {
         self.data.last_date()
     }

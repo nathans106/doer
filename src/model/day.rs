@@ -86,6 +86,10 @@ impl Day {
     pub fn push_note(&mut self, note: String) {
         self.notes.push(note);
     }
+
+    pub fn extend_notes(&mut self, notes: &[String]) {
+        self.notes.extend_from_slice(notes);
+    }
 }
 
 #[derive(Clone)]
