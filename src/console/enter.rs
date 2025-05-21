@@ -12,6 +12,36 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    Priority {
+        #[command(subcommand)]
+        command: PriorityCommand,
+    },
+    Show {
+        /// Date to show
+        date: String,
+    },
+    ShowLast,
+    Context {
+        #[command(subcommand)]
+        command: ContextCommand,
+    },
+    SetFocus {
+        /// name or ID of focus
+        focus: String,
+    },
+    Break {
+        #[command(subcommand)]
+        command: BreakCommand,
+    },
+    EndDay,
+    Note {
+        #[command(subcommand)]
+        command: NoteCommand,
+    },
+}
+
+#[derive(Subcommand)]
+enum PriorityCommand {
     Plan {
         /// Date to plan
         date: String,
@@ -22,35 +52,37 @@ enum Command {
         /// Date to copy to. Can be 'today', 'tomorrow', or a date in 'ISO format'
         to: String,
     },
-    Show {
-        /// Date to show
-        date: String,
-    },
-    ShowLast,
     Tick {
         id: u8,
     },
     UnTick {
         id: u8,
     },
-    Context,
-    Contexts,
-    SetContext {
+}
+
+#[derive(Subcommand)]
+enum ContextCommand {
+    Show,
+    ShowAll,
+    Set {
         /// Context to switch to
         context: String,
     },
-    SetFocus {
-        /// name or ID of focus
-        focus: String,
-    },
-    StartBreak,
-    EndBreak,
-    EndDay,
-    Note {
+}
+
+#[derive(Subcommand)]
+enum BreakCommand {
+    Start,
+    End,
+}
+
+#[derive(Subcommand)]
+enum NoteCommand {
+    Add {
         /// Note for today
         note: String,
     },
-    CopyNote {
+    Copy {
         /// Date to copy from. Can be 'today', 'tomorrow', or a date in 'ISO format'
         from: String,
         /// Date to copy to. Can be 'today', 'tomorrow', or a date in 'ISO format'
@@ -58,7 +90,7 @@ enum Command {
         /// Note ID to copy
         id: u16,
     },
-    CopyNotes {
+    CopyAll {
         /// Date to copy from. Can be 'today', 'tomorrow', or a date in 'ISO format'
         from: String,
         /// Date to copy to. Can be 'today', 'tomorrow', or a date in 'ISO format'
@@ -98,12 +130,20 @@ pub fn enter() -> anyhow::Result<()> {
     let mut client = Client::new()?;
 
     match cli.command {
-        Command::Plan { date } => {
-            client.plan_priorities(&date_from_arg(&date)?)?;
-        }
-        Command::Copy { from, to } => {
-            client.copy_priorities(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
-        }
+        Command::Priority { command } => match command {
+            PriorityCommand::Plan { date } => {
+                client.plan_priorities(&date_from_arg(&date)?)?;
+            }
+            PriorityCommand::Copy { from, to } => {
+                client.copy_priorities(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
+            }
+            PriorityCommand::Tick { id } => {
+                client.tick(&(id - 1))?;
+            }
+            PriorityCommand::UnTick { id } => {
+                client.un_tick(&(id - 1))?;
+            }
+        },
         Command::Show { date } => {
             client.show(&date_from_arg(&date)?)?;
         }
@@ -111,21 +151,17 @@ pub fn enter() -> anyhow::Result<()> {
             let date = client.last_date()?;
             client.show(&date)?;
         }
-        Command::Tick { id } => {
-            client.tick(&(id - 1))?;
-        }
-        Command::UnTick { id } => {
-            client.un_tick(&(id - 1))?;
-        }
-        Command::Context => {
-            client.context()?;
-        }
-        Command::Contexts => {
-            client.contexts()?;
-        }
-        Command::SetContext { context } => {
-            client.set_context(context)?;
-        }
+        Command::Context { command } => match command {
+            ContextCommand::Show => {
+                client.context()?;
+            }
+            ContextCommand::ShowAll => {
+                client.contexts()?;
+            }
+            ContextCommand::Set { context } => {
+                client.set_context(context)?;
+            }
+        },
         Command::SetFocus { focus } => match focus.parse::<u8>() {
             Ok(id) => {
                 client.set_focus_to_priority(&(id))?;
@@ -134,28 +170,32 @@ pub fn enter() -> anyhow::Result<()> {
                 client.set_focus(&focus)?;
             }
         },
-        Command::StartBreak => {
-            client.start_break()?;
-        }
-        Command::EndBreak => {
-            client.end_break()?;
-        }
+        Command::Break { command } => match command {
+            BreakCommand::Start => {
+                client.start_break()?;
+            }
+            BreakCommand::End => {
+                client.end_break()?;
+            }
+        },
         Command::EndDay => {
             client.end_day()?;
         }
-        Command::Note { note } => {
-            client.note(note)?;
-        }
-        Command::CopyNote { from, to, id } => {
-            client.copy_note(
-                &date_from_arg(&from)?,
-                &date_from_arg(&to)?,
-                (id - 1) as usize,
-            )?;
-        }
-        Command::CopyNotes { from, to } => {
-            client.copy_notes(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
-        }
+        Command::Note { command } => match command {
+            NoteCommand::Add { note } => {
+                client.note(note)?;
+            }
+            NoteCommand::Copy { from, to, id } => {
+                client.copy_note(
+                    &date_from_arg(&from)?,
+                    &date_from_arg(&to)?,
+                    (id - 1) as usize,
+                )?;
+            }
+            NoteCommand::CopyAll { from, to } => {
+                client.copy_notes(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
+            }
+        },
     }
 
     Ok(())
