@@ -90,6 +90,10 @@ impl Day {
     pub fn extend_notes(&mut self, notes: &[String]) {
         self.notes.extend_from_slice(notes);
     }
+
+    pub fn clear_notes(&mut self) {
+        self.notes.clear();
+    }
 }
 
 #[derive(Clone)]

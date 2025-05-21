@@ -96,6 +96,10 @@ enum NoteCommand {
         /// Date to copy to. Can be 'today', 'tomorrow', or a date in 'ISO format'
         to: String,
     },
+    Clear {
+        /// Date to clear
+        date: String,
+    },
 }
 
 fn weekday(id: &i64) -> NaiveDate {
@@ -194,6 +198,9 @@ pub fn enter() -> anyhow::Result<()> {
             }
             NoteCommand::CopyAll { from, to } => {
                 client.copy_notes(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
+            }
+            NoteCommand::Clear { date } => {
+                client.clear_notes(&date_from_arg(&date)?)?;
             }
         },
     }

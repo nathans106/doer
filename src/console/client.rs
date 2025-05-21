@@ -175,6 +175,16 @@ impl Client {
         Ok(())
     }
 
+    pub fn clear_notes(&self, date: &NaiveDate) -> anyhow::Result<()> {
+        {
+            let mut edit_guard = self.edit_day(*date)?;
+            let day = edit_guard.day();
+            day.clear_notes();
+        }
+        self.show_notes(date)?;
+        Ok(())
+    }
+
     pub fn last_date(&self) -> anyhow::Result<NaiveDate> {
         self.data.last_date()
     }
