@@ -159,7 +159,6 @@ impl Client {
                 .get(id)
                 .ok_or(anyhow!("No note at {id} found"))?;
             day_to.push_note(note.clone());
-            day_to.extend_notes(day_from.notes());
         }
         self.show_notes(to)?;
         Ok(())
