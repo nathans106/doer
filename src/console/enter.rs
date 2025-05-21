@@ -50,6 +50,14 @@ enum Command {
         /// Note for today
         note: String,
     },
+    CopyNote {
+        /// Date to copy from. Can be 'today', 'tomorrow', or a date in 'ISO format'
+        from: String,
+        /// Date to copy to. Can be 'today', 'tomorrow', or a date in 'ISO format'
+        to: String,
+        /// Note ID to copy
+        id: u16,
+    },
     CopyNotes {
         /// Date to copy from. Can be 'today', 'tomorrow', or a date in 'ISO format'
         from: String,
@@ -137,6 +145,13 @@ pub fn enter() -> anyhow::Result<()> {
         }
         Command::Note { note } => {
             client.note(note)?;
+        }
+        Command::CopyNote { from, to, id } => {
+            client.copy_note(
+                &date_from_arg(&from)?,
+                &date_from_arg(&to)?,
+                (id - 1) as usize,
+            )?;
         }
         Command::CopyNotes { from, to } => {
             client.copy_notes(&date_from_arg(&from)?, &date_from_arg(&to)?)?;

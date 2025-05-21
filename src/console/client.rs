@@ -3,6 +3,7 @@ use crate::model::data::Data;
 use crate::model::day::Priority;
 use crate::model::day_editor::DayEditor;
 use crate::storage::Storage;
+use anyhow::anyhow;
 use chrono::{NaiveDate, Utc};
 use inquire::Text;
 use std::path::PathBuf;
@@ -145,6 +146,22 @@ impl Client {
         let mut edit_guard = self.edit_today()?;
         let day = edit_guard.day();
         day.push_note(note);
+        Ok(())
+    }
+
+    pub fn copy_note(&self, from: &NaiveDate, to: &NaiveDate, id: usize) -> anyhow::Result<()> {
+        {
+            let mut edit_guard = self.edit_day(*to)?;
+            let day_to = edit_guard.day();
+            let day_from = self.data.day(from)?;
+            let note = day_from
+                .notes()
+                .get(id)
+                .ok_or(anyhow!("No note at {id} found"))?;
+            day_to.push_note(note.clone());
+            day_to.extend_notes(day_from.notes());
+        }
+        self.show_notes(to)?;
         Ok(())
     }
 
