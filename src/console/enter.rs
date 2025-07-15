@@ -1,6 +1,7 @@
 use crate::console::client::Client;
 use chrono::{Datelike, Local, NaiveDate};
 use clap::{Parser, Subcommand};
+use itertools::Itertools;
 use std::str::FromStr;
 
 #[derive(Parser)]
@@ -87,8 +88,8 @@ enum NoteCommand {
         from: String,
         /// Date to copy to. Can be 'today', 'tomorrow', or a date in 'ISO format'
         to: String,
-        /// Note ID to copy
-        id: u16,
+        /// Note IDs to copy
+        ids: Vec<u16>,
     },
     CopyAll {
         /// Date to copy from. Can be 'today', 'tomorrow', or a date in 'ISO format'
@@ -189,15 +190,15 @@ pub fn enter() -> anyhow::Result<()> {
             NoteCommand::Add { note } => {
                 client.note(note)?;
             }
-            NoteCommand::Copy { from, to, id } => {
-                client.copy_note(
+            NoteCommand::Copy { from, to, ids } => {
+                client.copy_notes(
                     &date_from_arg(&from)?,
                     &date_from_arg(&to)?,
-                    (id - 1) as usize,
+                    &ids.into_iter().map(|id| (id - 1) as usize).collect_vec(),
                 )?;
             }
             NoteCommand::CopyAll { from, to } => {
-                client.copy_notes(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
+                client.copy_all_notes(&date_from_arg(&from)?, &date_from_arg(&to)?)?;
             }
             NoteCommand::Clear { date } => {
                 client.clear_notes(&date_from_arg(&date)?)?;

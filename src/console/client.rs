@@ -149,22 +149,29 @@ impl Client {
         Ok(())
     }
 
-    pub fn copy_note(&self, from: &NaiveDate, to: &NaiveDate, id: usize) -> anyhow::Result<()> {
+    pub fn copy_notes(
+        &self,
+        from: &NaiveDate,
+        to: &NaiveDate,
+        ids: &[usize],
+    ) -> anyhow::Result<()> {
         {
             let mut edit_guard = self.edit_day(*to)?;
             let day_to = edit_guard.day();
             let day_from = self.data.day(from)?;
-            let note = day_from
-                .notes()
-                .get(id)
-                .ok_or(anyhow!("No note at {id} found"))?;
-            day_to.push_note(note.clone());
+            let notes_from = day_from.notes();
+            for id in ids {
+                let note = notes_from
+                    .get(*id)
+                    .ok_or(anyhow!("No note at {id} found"))?;
+                day_to.push_note(note.clone());
+            }
         }
         self.show_notes(to)?;
         Ok(())
     }
 
-    pub fn copy_notes(&self, from: &NaiveDate, to: &NaiveDate) -> anyhow::Result<()> {
+    pub fn copy_all_notes(&self, from: &NaiveDate, to: &NaiveDate) -> anyhow::Result<()> {
         {
             let mut edit_guard = self.edit_day(*to)?;
             let day_to = edit_guard.day();
