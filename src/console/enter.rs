@@ -123,6 +123,22 @@ fn date_from_arg(date: &str) -> anyhow::Result<NaiveDate> {
         "friday" => Ok(weekday(&4)),
         "saturday" => Ok(weekday(&5)),
         "sunday" => Ok(weekday(&6)),
+        // Days of the last week
+        "last-monday" => Ok(weekday(&-7)),
+        "last-tuesday" => Ok(weekday(&-6)),
+        "last-wednesday" => Ok(weekday(&-5)),
+        "last-thursday" => Ok(weekday(&-4)),
+        "last-friday" => Ok(weekday(&-3)),
+        "last-saturday" => Ok(weekday(&-2)),
+        "last-sunday" => Ok(weekday(&-1)),
+        // Days of the next week
+        "next-monday" => Ok(weekday(&7)),
+        "next-tuesday" => Ok(weekday(&8)),
+        "next-wednesday" => Ok(weekday(&9)),
+        "next-thursday" => Ok(weekday(&10)),
+        "next-friday" => Ok(weekday(&11)),
+        "next-saturday" => Ok(weekday(&12)),
+        "next-sunday" => Ok(weekday(&13)),
         _ => {
             let result = NaiveDate::from_str(date)?;
             Ok(result)
